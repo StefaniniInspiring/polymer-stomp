@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+  <title>polymer-stomp demo</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="../node_modules/stomp-websocket/lib/stomp.min.js"></script>
+  <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+  <script type="module">
+    import '@polymer/iron-demo-helpers/demo-pages-shared-styles'; import '@polymer/iron-demo-helpers/demo-snippet';
+  </script>
+
+  <script type="module" src="../polymer-stomp.js"></script>
+
+  <custom-style>
+    <style is="custom-style" include="demo-pages-shared-styles">
+    </style>
+  </custom-style>
+</head>
+
+<body>
+  <div class="vertical-section-container centered">
+    <h3>Basic polymer-stomp demo</h3>
+    <demo-snippet>
+      <template>
+        <polymer-stomp 
+          url="https://server.febrafar.stefaniniinspiring.com.br/singleinstance/chat" 
+          topic="/queue/message/0-54-1481162456609"></polymer-stomp>
+      </template>
+    </demo-snippet>
+  </div>
+</body>
+
+</html>
