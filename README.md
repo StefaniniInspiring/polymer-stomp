@@ -1,6 +1,6 @@
 # \<polymer-stomp\>
 
-A Polymer Web Component on top of stomp client and sockjs to send and receive messages throught web sockets
+A Polymer Web Component on top of stomp client and sockjs to send and receive messages through web sockets
 
 ## Install the Polymer-CLI
 
