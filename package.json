@@ -3,6 +3,7 @@
   "main": "polymer-stomp.js",
   "dependencies": {
     "@polymer/polymer": "^3.0.0",
+    "sockjs-client": "^1.1.5",
     "stomp-websocket": "^2.3.4-next"
   },
   "devDependencies": {
