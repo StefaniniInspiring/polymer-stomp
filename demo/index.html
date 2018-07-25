@@ -13,7 +13,7 @@
     import '@polymer/iron-demo-helpers/demo-pages-shared-styles'; import '@polymer/iron-demo-helpers/demo-snippet';
   </script>
 
-  <script type="module" src="../polymer-stomp.js"></script>
+  <script type="module" src="demo-element.js"></script>
 
   <custom-style>
     <style is="custom-style" include="demo-pages-shared-styles">
@@ -22,16 +22,14 @@
 </head>
 
 <body>
-  <div class="vertical-section-container centered">
-    <h3>Basic polymer-stomp demo</h3>
-    <demo-snippet>
-      <template>
-        <polymer-stomp 
-          url="https://server.febrafar.stefaniniinspiring.com.br/singleinstance/chat" 
-          topic="/queue/message/0-54-1481162456609"></polymer-stomp>
-      </template>
-    </demo-snippet>
-  </div>
+  <dom-bind>
+    <template is="dom-bind" id="r">
+      <div class="vertical-section-container centered">
+        <h3>Basic polymer-stomp demo</h3>
+        <demo-element></demo-element>
+      </div>
+    </template>
+  </dom-bind>
 </body>
 
 </html>

@@ -30,7 +30,7 @@ class polymerStomp extends PolymerElement {
   static get properties() {
     return {
       autoConnect: {
-        type: String
+        type: Boolean
       },
       url: {
         type: String,
@@ -38,11 +38,31 @@ class polymerStomp extends PolymerElement {
       },
       topic: {
         type: String,
-        notify: true
+        notify: true,
+        observer: '_topicChanged'
       },
       debug: {
+        type: Boolean,
+        notify: true
+      },
+      online: {
+        type: Boolean,
+        notify: true
+      },
+      connectHeaders: {
         type: String,
         notify: true
+      },
+      sendHeaders: {
+        type: String,
+        notify: true
+      },
+      sendTopic: {
+        type: String,
+        notify: true
+      },
+      additionalSendHeaders: {
+        type: String
       }
     };
   }
@@ -50,52 +70,78 @@ class polymerStomp extends PolymerElement {
     super();
   }
 
+  _topicChanged(newValue, oldValue) {
+    this.connect(newValue);
+  }
+
   ready() {
     super.ready();
 
-    if (this.autoConnect !== 'false') {
-      this.socket = new SockJS(this.url);
+    if (this.autoConnect) {
+      this.connect();
+    }
+  }
 
-      var actorId = '0-54-1481162456609';
-      var topic = this.topic
-      var element = this
+  connect() {
+    if (this.socket)
+      this.close();
+    if (!this.url || !this.topic)
+       return;
 
-      var connectHeaders = {
-        'actorId': actorId,
-        'requestId': actorId + "-" + Date.now()
-      };
+    this.socket = new SockJS(this.url);
+    var topic = this.topic;
 
-      var stompClient = Stomp.over(this.socket);
-      
-      if (this.debug === 'false') {
-        stompClient.debug = null;
-      }
-      
-      stompClient.connect(connectHeaders, function () {
-        stompClient.subscribe(topic, function (message) {
-          var parsedMessage = JSON.parse(message.body);
-          var event = new CustomEvent('message', {
-            'detail': parsedMessage
-          });
+    var connectHeaders = {};
+    if ((typeof(this.connectHeaders) !== 'undefined')) {
+      connectHeaders = JSON.parse(this.connectHeaders);
+    } 
 
-          element._handleEvent(event);
-        });
-      }, function (err) {
-        console.error(err);
-      });
-      
+    this.stompClient = Stomp.over(this.socket);
+
+    if (!this.debug) {
+      this.stompClient.debug = null;
     }
 
+    this.stompClient.connect(connectHeaders, () => {
+      this.subscribe(topic);
+    }, function (err) {
+      console.error(err);
+    });
   }
 
   _handleEvent(event) {
-    console.log(event.detail);
-    //this.fire('message', event.detail);
+    //console.log(event.detail);
+    this.dispatchEvent(new CustomEvent('message', {detail: event.detail}));
+    this.send('echo');
+  }
+
+  subscribe(topic) {
+    var element = this;
+    this.stompClient.subscribe(topic, function (message) {
+      var parsedMessage = JSON.parse(message.body);
+      var event = new CustomEvent('message', {
+        'detail': parsedMessage
+      });
+
+      element._handleEvent(event);
+    });
   }
 
   send(message) {
-    if (this.socket)
-      this.socket.send(message);
+    if (this.stompClient) {
+
+      var msg = message;
+      if (typeof(this.additionalSendHeaders) !== 'undefined') {
+        var msg = JSON.parse(this.additionalSendHeaders);
+        msg.text = message;
+      }
+
+      var sendHeaders = {};
+      if (typeof(this.sendHeaders) !== 'undefined') {
+        sendHeaders = JSON.parse(this.sendHeaders);
+      }
+      this.stompClient.send(this.sendTopic, sendHeaders, JSON.stringify(msg));
+    }
   }
 
   close() {
@@ -103,25 +149,6 @@ class polymerStomp extends PolymerElement {
       this.socket.close();
   }
 
-  connect() {
-    if (this.socket)
-      this.close();
-    if (!this.url || !this.topic)
-      return;
-    this.socket = new SockJS(this.url);
-    var stompClient = Stomp.over(this.socket);
-    var topic = this.topic
-    var element = this
-    stompClient.connect({}, function () {
-      stompClient.subscribe(topic, function (message) {
-        var parsedMessage = JSON.parse(message.body);
-        var event = new CustomEvent('message', {
-          'detail': parsedMessage
-        });
-        element._handleEvent(event);
-      });
-    });
-  }
 }
 
 window.customElements.define('polymer-stomp', polymerStomp);
